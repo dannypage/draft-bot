@@ -1,8 +1,8 @@
 require 'logger'
 require 'json'
 require 'net/http'
+require 'csv'
 
-Dir.chdir('/Users/Danny/Projects/draft/')
 log = Logger.new('results.log')
 
 class Draft
@@ -12,23 +12,42 @@ class Draft
 end
 
 class PlayerList
-  def initialize
-    @wrs = download_list('WR')
+  @@players = {}
+
+  def initialize(list)
+    list.each do |player|
+      Player.new(player)
+    end
   end
 
-  def download_list(position)
-    response = Net::HTTP.get_response(URI.parse("http://draft.gnmerritt.net/api/v1/nfl/position/#{position}"))
-    list = JSON.parse(response.body)
+end
+
+class Player
+  def initialize(player)
+    @first = player[:first]
+    @last = player[:last]
+    @value = player[:val]
+    @percent = player[:ps]
+    @pos = player[:pos]
+    @id = lookup(player)
+  end
+
+  def lookup(player)
+    response = NET::HTTP.get_response(
+        URI.parse("http://draft.gnmerritt.net/api/v1/search/name/#{player[:last]}/pos/#{player[:pos]}"))
+    list = JSON(response.body)
     puts list
   end
 end
 
-class Player < PlayerList
+players = []
 
+CSV.foreach('players.csv', :headers => true, :header_converters => :symbol, :converters => :all) do |row|
+  players << Hash[row.headers[0..-1].zip(row.fields[0..-1])]
 end
 
 loop do
-  pl = PlayerList.new
+  pl = PlayerList.new(players)
   log.debug('Woo')
   sleep(60)
 end
