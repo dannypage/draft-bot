@@ -5,6 +5,17 @@ require 'csv'
 
 $log = Logger.new('results.log')
 
+def request_wrapper(url)
+  begin
+    response = Net::HTTP.get_response(URI.parse(url))
+    list = JSON(response.body)
+    return response, list
+  rescue Exception => e
+    puts e
+    retry
+  end
+end
+
 class PlayerList
 
   def initialize(list)
@@ -13,10 +24,11 @@ class PlayerList
     list.each do |player|
       @players << Player.new(player)
     end
+
+    @players.sort! { |a,b| b.value <=> a.value }
   end
 
   def best_available(pos='any')
-    @players.sort! { |a,b| b.value <=> a.value }
     if pos == 'any'
       @players.each do |player|
         if player.not_drafted
@@ -59,10 +71,9 @@ class Player
   end
 
   def get_id(player)
+    player_url = "http://draft.gnmerritt.net/api/v1/search/name/#{player[:last]}/pos/#{player[:pos]}"
+    response, list = request_wrapper(player_url)
 
-    response = Net::HTTP.get_response(
-        URI.parse("http://draft.gnmerritt.net/api/v1/search/name/#{player[:last]}/pos/#{player[:pos]}"))
-    list = JSON(response.body)
     if list and list['results'] and list['results'].count > 1
       found = list['results'].find { |x| x['first_name'] == player[:first] }
       if found and found['id']
@@ -74,7 +85,7 @@ class Player
     elsif list and list['results'] and list['results'].count == 1
       return list['results'][0]['id']
     else
-      nil
+      puts "Cannot find #{player[:first]} #{player[:last]}"
     end
   end
 end
@@ -85,8 +96,7 @@ class Draft
 
   def initialize(url)
     $log.info('Starting the draft!')
-    response = Net::HTTP.get_response(URI.parse(url))
-    list = JSON(response.body)
+    response, list = request_wrapper(url)
 
     @rounds = list['roster']['slots']
     @teams = []
@@ -99,8 +109,9 @@ class Draft
   end
 
   def update(url, pl)
-    response = Net::HTTP.get_response(URI.parse(url))
-    list = JSON(response.body)
+    request, list = request_wrapper(url)
+
+
     selected = list['selections'].map { |x| x['player']['id']}
 
     if selected != @selections
@@ -111,10 +122,12 @@ class Draft
       end
       @selections = selected
     end
+
+    list
   end
 
   def find_team(team_name)
-    puts "Finding our team."
+    puts 'Finding our team.'
     @teams.each do |team|
       if team.name == team_name
         return team
@@ -141,7 +154,7 @@ class Team
   def pick_time
     now = Time.now.to_i
     @picks.each do |pick|
-      if pick < now and ( pick +30) > now
+      if pick < now and ( pick +10) > now
         return true
       end
     end
@@ -151,9 +164,10 @@ end
 
 players = []
 #url = 'http://draft.gnmerritt.net/api/v1/draft?key=d6ba52c5-aae1-48d5-9136-73c4f624ad25'
-url = 'http://draft.gnmerritt.net/api/v1/draft?key=45d25107-91f3-458b-89db-e9bfa900aab9'
-key = '45d25107-91f3-458b-89db-e9bfa900aab9'
+#key = 'd6ba52c5-aae1-48d5-9136-73c4f624ad25'
 #team_name = 'Nybble and Bits'
+url = 'http://draft.gnmerritt.net/api/v1/draft?key=94d062b3-1381-4a63-a679-a5ca9b166380'
+key = '94d062b3-1381-4a63-a679-a5ca9b166380'
 team_name = "Nybble and Bits's mock draft team"
 
 CSV.foreach('players.csv', :headers => true, :header_converters => :symbol, :converters => :all) do |row|
@@ -163,16 +177,29 @@ end
 pl = PlayerList.new(players)
 draft = Draft.new(url)
 my_team = draft.find_team(team_name)
+picks = 0
 
 loop do
-  draft.update(url, pl)
-  player = pl.best_available
-  $log.info("Best Available: #{player.first} #{player.last}")
-  my_pick_status = my_team.pick_time
-  $log.info("Is it my turn? #{my_pick_status}")
-  if my_pick_status
-    pick_url = "http://draft.gnmerritt.net/api/v1/pick_player/#{player.id}?key=#{key}"
-    response = Net::HTTP.get_response(URI.parse(pick_url))
+  response = draft.update(url, pl)
+  response['teams'].each do |team|
+    if team['name'] == team_name
+      picks = team['selection_ids'].count
+    end
   end
-  sleep(5)
+
+  my_pick_status = my_team.pick_time
+  if my_pick_status
+    $log.info("Round ##{picks+1}: Thinking about a player.")
+    if picks == 13
+      player = pl.best_available('DST')
+    elsif picks == 14
+      player = pl.best_available('K')
+    else
+      player = pl.best_available
+    end
+    pick_url = "http://draft.gnmerritt.net/api/v1/pick_player/#{player.id}?key=#{key}"
+    $log.info("Selected #{player.first} #{player.last}")
+    response = request_wrapper(pick_url)
+  end
+  sleep(3)
 end

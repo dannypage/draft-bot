@@ -177,76 +177,76 @@ Ryan,Fitzpatrick,-4.1,0,QB
 Matt,Schaub,-4.4,0,QB
 Teddy,Bridgewater,-6.7,0,QB
 Chad,Henne,-7.6,0,QB
-Seattle,Seahawks,-7.7,0,Def
-San Francisco,49ers,-7.8,0,Def
-Carolina,Panthers,-7.9,0,Def
-Stephen,Gostkowski,-8,0,PK
-Kansas City,Chiefs,-8.1,0,Def
-Denver,Broncos,-8.2,0,Def
-St. Louis,Rams,-8.3,0,Def
-Cincinnati,Bengals,-8.4,0,Def
-Arizona,Cardinals,-8.5,0,Def
+Seattle,Seahawks,-7.7,0,DST
+San Francisco,49ers,-7.8,0,DST
+Carolina,Panthers,-7.9,0,DST
+Stephen,Gostkowski,-8,0,K
+Kansas City,Chiefs,-8.1,0,DST
+Denver,Broncos,-8.2,0,DST
+St. Louis,Rams,-8.3,0,DST
+Cincinnati,Bengals,-8.4,0,DST
+Arizona,Cardinals,-8.5,0,DST
 Josh,Gordon,-8.6,0,WR
-Justin,Tucker,-8.7,0,PK
-New England,Patriots,-8.8,0,Def
-Mason,Crosby,-8.9,0,PK
-Phil,Dawson,-9,0,PK
+Justin,Tucker,-8.7,0,K
+New England,Patriots,-8.8,0,DST
+Mason,Crosby,-8.9,0,K
+Phil,Dawson,-9,0,K
 Jordan,Matthews,-9.1,0,WR
-Dan,Bailey,-9.2,0,PK
-Houston,Texans,-9.3,0,Def
+Dan,Bailey,-9.2,0,K
+Houston,Texans,-9.3,0,DST
 Tre,Mason,-9.4,0,RB
-Adam,Vinatieri,-9.5,0,PK
+Adam,Vinatieri,-9.5,0,K
 Blake,Bortles,-9.6,0,QB
-Chicago,Bears,-9.7,0,Def
+Chicago,Bears,-9.7,0,DST
 BenJarvus,Green-Ellis,-9.8,0,RB
 Davante,Adams,-9.9,0,WR
 Dexter,McCluster,-10,0,RB
 Cody,Latimer,-10.1,0,WR
-Blair,Walsh,-10.2,0,PK
-Buffalo,Bills,-10.3,0,Def
+Blair,Walsh,-10.2,0,K
+Buffalo,Bills,-10.3,0,DST
 Odell,Beckham,-10.4,0,WR
-New Orlean,Saints,-10.5,0,Def
+New Orlean,Saints,-10.5,0,DST
 Marqise,Lee,-10.6,0,WR
-Tampa Bay,Buccaneers,-10.7,0,Def
+Tampa Bay,Buccaneers,-10.7,0,DST
 Austin,Seferian-Jenkins,-10.8,0,TE
-Cleveland,Browns,-10.9,0,Def
+Cleveland,Browns,-10.9,0,DST
 James,Starks,-11,0,RB
-New York,Giants,-11.1,0,Def
-Robbie,Gould,-11.2,0,PK
+New York,Giants,-11.1,0,DST
+Robbie,Gould,-11.2,0,K
 Aaron,Dobson,-11.3,0,WR
-Green Bay,Packers,-11.4,0,Def
-Baltimore,Ravens,-11.5,0,Def
-Nick,Novak,-11.6,0,PK
+Green Bay,Packers,-11.4,0,DST
+Baltimore,Ravens,-11.5,0,DST
+Nick,Novak,-11.6,0,K
 Andrew,Hawkins,-11.7,0,WR
 Kenbrell,Thompkins,-11.8,0,WR
 Jerricho,Cotchery,-11.9,0,WR
-Pittsburgh,Steelers,-12,0,Def
+Pittsburgh,Steelers,-12,0,DST
 Jace,Amaro,-12.1,0,TE
 Jonathan,Grimes,-12.2,0,RB
-Philadelphia,Eagles,-12.3,0,Def
-Miami,Dolphins,-12.4,0,Def
+Philadelphia,Eagles,-12.3,0,DST
+Miami,Dolphins,-12.4,0,DST
 C.J.,Anderson,-12.5,0,RB
-Minnesota,Vikings,-12.6,0,Def
-Shaun,Suisham,-12.7,0,PK
-Greg,Zuerlein,-12.8,0,PK
-Alex,Henery,-12.9,0,PK
-Indianapolis,Colts,-13,0,Def
-Sebastian,Janikowski,-13.1,0,PK
-Ryan,Succop,-13.2,0,PK
-New York,Jets,-13.3,0,Def
+Minnesota,Vikings,-12.6,0,DST
+Shaun,Suisham,-12.7,0,K
+Greg,Zuerlein,-12.8,0,K
+Alex,Henery,-12.9,0,K
+Indianapolis,Colts,-13,0,DST
+Sebastian,Janikowski,-13.1,0,K
+Ryan,Succop,-13.2,0,K
+New York,Jets,-13.3,0,DST
 Jerick,McKinnon,-13.4,0,RB
 Brandon,LaFell,-13.5,0,WR
-Detroit,Lions,-13.6,0,Def
-Nate,Freese,-13.7,0,PK
+Detroit,Lions,-13.6,0,DST
+Nate,Freese,-13.7,0,K
 Dri,Archer,-13.8,0,RB
 KaDeem,Carey,-13.9,0,RB
 Robert,Woods,-14,0,WR
-Graham,Gano,-14.1,0,PK
-Dan,Carpenter,-14.2,0,PK
-Nick,Folk,-14.3,0,PK
+Graham,Gano,-14.1,0,K
+Dan,Carpenter,-14.2,0,K
+Nick,Folk,-14.3,0,K
 Michael,Vick,-14.4,0,QB
-Jay,Feely,-14.5,0,PK
+Jay,Feely,-14.5,0,K
 Ronnie,Hillman,-14.6,0,RB
 Donte,Moncrief,-14.7,0,WR
-Mike,Nugent,-14.8,0,PK
+Mike,Nugent,-14.8,0,K
 Denarius,Moore,-14.9,0,WR
