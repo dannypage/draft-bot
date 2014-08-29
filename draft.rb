@@ -8,6 +8,7 @@ $log = Logger.new('results.log')
 class PlayerList
 
   def initialize(list)
+    $log.info('Player list initialized!')
     @players = []
     list.each do |player|
       @players << Player.new(player)
@@ -33,11 +34,11 @@ class PlayerList
     nil #ruhroh, out of players?
   end
 
-  def toggle_drafts(selected)
+  def toggle_drafts(selected_id)
     @players.each do |player|
-      if player.id == selected
+      if player.id == selected_id
         player.not_drafted = false
-        return
+        return player
       end
     end
   end
@@ -83,6 +84,7 @@ class Draft
   attr_accessor :teams, :selections
 
   def initialize(url)
+    $log.info('Starting the draft!')
     response = Net::HTTP.get_response(URI.parse(url))
     list = JSON(response.body)
 
@@ -99,16 +101,20 @@ class Draft
   def update(url, pl)
     response = Net::HTTP.get_response(URI.parse(url))
     list = JSON(response.body)
-    if list['selections'] != @selections
-      diff = list['selections']-@selections
-      diff.each do |selected|
-        player = pl.toggle_drafts(selected)
+    selected = list['selections'].map { |x| x['player']['id']}
+
+    if selected != @selections
+      diff = selected -@selections
+      diff.each do |select|
+        player = pl.toggle_drafts(select)
         $log.info("#{player.first} #{player.last} was drafted.")
       end
+      @selections = selected
     end
   end
 
   def find_team(team_name)
+    puts "Finding our team."
     @teams.each do |team|
       if team.name == team_name
         return team
@@ -132,10 +138,10 @@ class Team
     end
   end
 
-  def pick?
-    now = Time.now.utc
+  def pick_time
+    now = Time.now.to_i
     @picks.each do |pick|
-      if pick < now < (pick +30)
+      if pick < now and ( pick +30) > now
         return true
       end
     end
@@ -145,8 +151,10 @@ end
 
 players = []
 #url = 'http://draft.gnmerritt.net/api/v1/draft?key=d6ba52c5-aae1-48d5-9136-73c4f624ad25'
-url = 'http://draft.gnmerritt.net/api/v1/draft?key=4cf416f5-7e5e-4cd8-8e20-b6b9d5858b82'
-team_name = 'Nybble and Bits'
+url = 'http://draft.gnmerritt.net/api/v1/draft?key=45d25107-91f3-458b-89db-e9bfa900aab9'
+key = '45d25107-91f3-458b-89db-e9bfa900aab9'
+#team_name = 'Nybble and Bits'
+team_name = "Nybble and Bits's mock draft team"
 
 CSV.foreach('players.csv', :headers => true, :header_converters => :symbol, :converters => :all) do |row|
   players << Hash[row.headers[0..-1].zip(row.fields[0..-1])]
@@ -160,6 +168,11 @@ loop do
   draft.update(url, pl)
   player = pl.best_available
   $log.info("Best Available: #{player.first} #{player.last}")
-  $log.info("Is it my turn? #{my_team.pick?}")
+  my_pick_status = my_team.pick_time
+  $log.info("Is it my turn? #{my_pick_status}")
+  if my_pick_status
+    pick_url = "http://draft.gnmerritt.net/api/v1/pick_player/#{player.id}?key=#{key}"
+    response = Net::HTTP.get_response(URI.parse(pick_url))
+  end
   sleep(5)
 end
