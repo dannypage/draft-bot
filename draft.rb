@@ -154,7 +154,7 @@ end
 
 pl = PlayerList.new(players)
 draft = Draft.new(url)
-my_team = pl.find_team(team_name)
+my_team = draft.find_team(team_name)
 
 loop do
   draft.update(url, pl)
