@@ -154,7 +154,7 @@ class Team
   def pick_time
     now = Time.now.to_i
     @picks.each do |pick|
-      if pick < now and ( pick +10) > now
+      if pick < now and ( pick +15) > now
         return true
       end
     end
@@ -166,8 +166,8 @@ players = []
 #url = 'http://draft.gnmerritt.net/api/v1/draft?key=d6ba52c5-aae1-48d5-9136-73c4f624ad25'
 #key = 'd6ba52c5-aae1-48d5-9136-73c4f624ad25'
 #team_name = 'Nybble and Bits'
-url = 'http://draft.gnmerritt.net/api/v1/draft?key=94d062b3-1381-4a63-a679-a5ca9b166380'
-key = '94d062b3-1381-4a63-a679-a5ca9b166380'
+url = 'http://draft.gnmerritt.net/api/v1/draft?key=f49154ff-0985-46d2-9738-74455058b2c7'
+key = 'f49154ff-0985-46d2-9738-74455058b2c7'
 team_name = "Nybble and Bits's mock draft team"
 
 CSV.foreach('players.csv', :headers => true, :header_converters => :symbol, :converters => :all) do |row|
@@ -179,18 +179,60 @@ draft = Draft.new(url)
 my_team = draft.find_team(team_name)
 picks = 0
 
+first_limit = {'WR'=>3, 'RB'=>3, 'TE'=>1,'QB'=>1,'DST'=>0,'K'=>0}
+second_limit = {'WR'=>5, 'RB'=>4, 'TE'=>2,'QB'=>2,'DST'=>1,'K'=>1}
+
 loop do
+  positions = {'WR'=>0, 'RB'=>0, 'TE'=>0,'QB'=>0,'DST'=>0,'K'=>0}
+
   response = draft.update(url, pl)
   response['teams'].each do |team|
     if team['name'] == team_name
       picks = team['selection_ids'].count
+      team_id = team['id']
+      team_request = "http://draft.gnmerritt.net/api/v1/team/#{team_id}"
+      blah, team_info = request_wrapper(team_request)
+      team_info['players'].each do |player|
+        pos = player['nfl_position']['abbreviation']
+        positions[pos] += 1
+      end
     end
   end
 
   my_pick_status = my_team.pick_time
   if my_pick_status
-    $log.info("Round ##{picks+1}: Thinking about a player.")
-    if picks == 13
+    $log.info("Round ##{picks+1}: Taking best available.")
+    if picks < 8
+      player = pl.best_available
+      pos = player.pos
+      if positions[pos] == first_limit[pos]
+        $log.info("Round ##{picks+1}: Nope, got enough #{pos}'s - Taking next best.")
+        if first_limit['RB'] != positions['RB']
+          player = pl.best_available('RB')
+        elsif first_limit['WR'] != positions['WR']
+          player = pl.best_available('WR')
+        elsif first_limit['TE'] != positions['TE']
+          player = pl.best_available('TE')
+        else
+          player = pl.best_available('QB')
+        end
+      end
+    elsif picks < 13
+      player = pl.best_available
+      pos = player.pos
+      if positions[pos] == second_limit[pos]
+        $log.info("Round ##{picks+1}: Nope, got enough #{pos}'s - Taking next best.")
+        if second_limit['RB'] != positions['RB']
+          player = pl.best_available('RB')
+        elsif second_limit['WR'] != positions['WR']
+          player = pl.best_available('WR')
+        elsif second_limit['TE'] != positions['TE']
+          player = pl.best_available('TE')
+        else
+          player = pl.best_available('QB')
+        end
+      end
+    elsif picks == 13
       player = pl.best_available('DST')
     elsif picks == 14
       player = pl.best_available('K')
